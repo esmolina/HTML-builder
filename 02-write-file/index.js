@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const {stdin} = process;
-const userMessagesChannel = process.stdin;
+const userMessagesChannel = process.stdout;
 const filePath = path.join(__dirname, 'recording.txt');
 
 // We show prompt message only first time
