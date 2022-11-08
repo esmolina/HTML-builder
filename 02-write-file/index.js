@@ -7,6 +7,8 @@ const filePath = path.join(__dirname, 'recording.txt');
 // We show prompt message only first time
 let additionalMessageIsShowed = false;
 
+const countOfNewLineSymbols = process.platform === "win32" ? 2 : 1;
+
 // Initialization
 function fileOpening() {
     fs.writeFile(
@@ -32,7 +34,8 @@ function registerUserInputHandler() {
     stdin.on('data', enteredSymbols => {
         const content = `${enteredSymbols}`;
         // We have to exit by "exit" word
-        if (content.slice(0, -1).toLowerCase() === 'exit') {
+        // May be, will be better content.trimEnd().toLowerCase() if spaces at the end are not important
+        if (content.slice(0, -countOfNewLineSymbols).toLowerCase() === 'exit') {
             userMessagesChannel.write(`Good job. Goodbye\n`);
             process.exit(0);
         }
