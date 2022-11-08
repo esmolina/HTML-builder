@@ -9,10 +9,34 @@ const markupResultPath = path.join(__dirname, 'project-dist', 'index.html');
 const copiedAssetsPath = path.join(__dirname, 'project-dist', 'assets');
 
 //create directory
-fs.promises.mkdir(projectPath, { recursive: true });
+// fs.promises.mkdir(projectPath, { recursive: true });
+
+(async function createDir() {
+    //remove old directory
+    fs.promises.stat(projectPath, err => {
+        if (!err) {
+            fs.rmdir(projectPath, {recursive: true, force: true}, err => {
+                fs.promises.mkdir(projectPath, {recursive: true});
+                if (err) {
+                    throw err
+                }
+                fs.promises.open(path.join(__dirname, 'project-dist', 'style.css'), 'r+', (err) => {
+                    if(err) throw err;
+                });
+            });
+        }
+
+       fs.promises.mkdir(projectPath, { recursive: true });
+        fs.promises.open(path.join(__dirname, 'project-dist', 'style.css'), 'r+', (err) => {
+            if(err) throw err;
+        });
+
+    })
+}())
+
 
 //create index.html
-(async function buildHtml() {
+async function buildHtml() {
     let readBuffer = await fs.promises.readFile(markupSourcePath, 'utf-8');
     let direntArray = await fs.promises.readdir(componentsPath, {withFileTypes: true});
     for (let element of direntArray) {
@@ -26,7 +50,8 @@ fs.promises.mkdir(projectPath, { recursive: true });
         }
     }
     await fs.promises.writeFile(markupResultPath, `${readBuffer}`, err => {if (err) {throw err}});
-}())
+}
+buildHtml()
 
 // create style.css
 fs.promises.readdir(stylesPath, {withFileTypes: true})
@@ -52,7 +77,7 @@ fs.promises.readdir(stylesPath, {withFileTypes: true})
 
 
 //copy assets
-function copyFile(assetsPath, savedPath) {
+async function copyFile(assetsPath, savedPath) {
         fs.readdir(assetsPath,
         {withFileTypes: true},
         (err, folderContent) => {
@@ -81,13 +106,13 @@ function copyFile(assetsPath, savedPath) {
         })
 }
 
-(function copyDir() {
+(async function copyDir() {
     //remove old directory
     fs.stat(copiedAssetsPath, err => {
         if (!err) {
             fs.rmdir(copiedAssetsPath, {recursive: true, force: true}, err => {
                 fs.promises.mkdir(copiedAssetsPath, {recursive: true});
-                copyFile(assetsPathPath, copiedAssetsPath);
+                copyFile(assetsPath, copiedAssetsPath);
                 if (err) {
                     throw err
                 }
